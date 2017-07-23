@@ -25,6 +25,9 @@ sudo_users = config['ADMIN']['sudo']
 dispatcher = updater.dispatcher
 
 
+def id(bot, update):
+    update.message.reply_text(str(update.message.chat_id))
+
 def build(bot, update):
     if isAuthorized(update):
         bot.sendChatAction(chat_id=update.message.chat_id,
@@ -125,13 +128,13 @@ def sendNotAuthorizedMessage(bot, update):
 build_handler = CommandHandler('build', build)
 upload_handler = CommandHandler('upload', upload)
 restart_handler = CommandHandler('restart', restart)
-execute_handler = MessageHandler([Filters.text], execute)
+id_handler = CommandHandler('id', id)
 
 dispatcher.add_handler(build_handler)
 dispatcher.add_handler(upload_handler)
 dispatcher.add_handler(restart_handler)
-dispatcher.add_handler(execute_handler)
 dispatcher.add_handler(InlineQueryHandler(inlinequery))
+dispatcher.add_handler(id_handler)
 
 updater.start_polling()
 updater.idle()
