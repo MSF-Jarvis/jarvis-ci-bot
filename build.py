@@ -22,6 +22,7 @@ config.read('bot.ini')
 updater = Updater(token=config['KEYS']['bot_api'])
 path = config['PATH']['path']
 sudo_users = config['ADMIN']['sudo']
+sudo_usernames =  config['ADMIN']['usernames']
 dispatcher = updater.dispatcher
 
 
@@ -84,7 +85,7 @@ def execute(bot, update, direct=True):
         command = update.inline_query.query
         inline = True
 
-    if isAuthorizedID(user_id):
+    if isAuthorizedID(user_id, update.inline_query.from_user.name):
         if not inline:
             bot.sendChatAction(chat_id=update.message.chat_id,
                                action=ChatAction.TYPING)
@@ -99,10 +100,8 @@ def execute(bot, update, direct=True):
 
         if inline:
             return output
-    elif user_id == 92027269:
-        return ""
     else:
-        return "Nope"
+        return "Die " + update.inline_query.from_user.name
 
 def inlinequery(bot, update):
     query = update.inline_query.query
@@ -119,10 +118,10 @@ def inlinequery(bot, update):
     bot.answerInlineQuery(update.inline_query.id, results=results, cache_time=10)
 
 def isAuthorized(update):
-    return update.message.from_user.id in sudo_users
+    return update.message.from_user.id in sudo_users and update.message.from_user.name in sudo_usernames
 
-def isAuthorizedID(userid):
-    return str(userid) in sudo_users
+def isAuthorizedID(userid, username):
+    return str(userid) in sudo_users and username in sudo_usernames
 
 def sendNotAuthorizedMessage(bot, update):
     bot.sendChatAction(chat_id=update.message.chat_id,
