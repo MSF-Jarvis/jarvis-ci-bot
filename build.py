@@ -4,6 +4,7 @@ import configparser
 import logging
 import os
 import subprocess
+import glob
 
 import time
 
@@ -36,26 +37,9 @@ def build(bot, update):
         bot.sendMessage(chat_id=update.message.chat_id,
                         text="Building and uploading to the chat")
         os.chdir(path)
-        build_command = ['./build.sh']
+        build_command = ['./gradlew', 'assembleDebug']
         subprocess.call(build_command)
-        filename = path + "out/" + open(path + ".final_ver").read().strip() + ".zip"
-        bot.sendChatAction(chat_id=update.message.chat_id,
-                           action=ChatAction.UPLOAD_DOCUMENT)
-        bot.sendDocument(
-            document=open(filename, "rb"),
-            chat_id=update.message.chat_id)
-    else:
-        sendNotAuthorizedMessage(bot, update)
-
-
-def upload(bot, update):
-    if isAuthorized(update):
-        bot.sendChatAction(chat_id=update.message.chat_id,
-                           action=ChatAction.TYPING)
-        bot.sendMessage(chat_id=update.message.chat_id,
-                        text="Uploading to the chat")
-        os.chdir(path + "/out")
-        filename = path + "out/" + open(path + ".final_ver").read().strip() + ".zip"
+        filename = glob.glob(path+"app/build/outputs/apk/debug/*.apk")[0]
         bot.sendChatAction(chat_id=update.message.chat_id,
                            action=ChatAction.UPLOAD_DOCUMENT)
         bot.sendDocument(
@@ -73,55 +57,8 @@ def restart(bot, update):
     else:
         sendNotAuthorizedMessage(bot, update)
 
-def execute(bot, update, direct=True):
-
-    try:
-        user_id = update.message.from_user.id
-        command = update.message.text
-        inline = False
-    except AttributeError:
-        # Using inline
-        user_id = update.inline_query.from_user.id
-        command = update.inline_query.query
-        inline = True
-
-    if isAuthorizedID(user_id, update.inline_query.from_user.name):
-        if not inline:
-            bot.sendChatAction(chat_id=update.message.chat_id,
-                               action=ChatAction.TYPING)
-        output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        output = output.stdout.read().decode('utf-8')
-        output = '`{0}`'.format(output)
-
-        if not inline:
-            bot.sendMessage(chat_id=update.message.chat_id,
-                        text=output, parse_mode="Markdown")
-            return False
-
-        if inline:
-            return output
-    else:
-        return "Die " + update.inline_query.from_user.name
-
-def inlinequery(bot, update):
-    query = update.inline_query.query
-    o = execute(query, update, direct=False)
-    results = list()
-
-    results.append(InlineQueryResultArticle(id=uuid4(),
-                                            title=query,
-                                            description=o,
-                                            input_message_content=InputTextMessageContent(
-                                                '*{0}*\n\n{1}'.format(query, o),
-                                                parse_mode="Markdown")))
-
-    bot.answerInlineQuery(update.inline_query.id, results=results, cache_time=10)
-
 def isAuthorized(update):
-    return update.message.from_user.id in sudo_users and update.message.from_user.name in sudo_usernames
-
-def isAuthorizedID(userid, username):
-    return str(userid) in sudo_users and username in sudo_usernames
+    return str(update.message.from_user.id) in sudo_users and update.message.from_user.name in sudo_usernames
 
 def sendNotAuthorizedMessage(bot, update):
     bot.sendChatAction(chat_id=update.message.chat_id,
@@ -131,16 +68,10 @@ def sendNotAuthorizedMessage(bot, update):
 
 
 build_handler = CommandHandler('build', build)
-upload_handler = CommandHandler('upload', upload)
 restart_handler = CommandHandler('restart', restart)
-id_handler = CommandHandler('id', id)
 
 dispatcher.add_handler(build_handler)
-dispatcher.add_handler(upload_handler)
 dispatcher.add_handler(restart_handler)
-dispatcher.add_handler(InlineQueryHandler(inlinequery))
-dispatcher.add_handler(id_handler)
 
 updater.start_polling()
 updater.idle()
-# Paul's ID --> 171119240
