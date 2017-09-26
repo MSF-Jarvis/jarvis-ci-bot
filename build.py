@@ -103,6 +103,21 @@ def execute(bot, update, direct=True):
     else:
         return "Die " + update.inline_query.from_user.name
 
+def exec(bot, update, args):
+    chat_id = update.message.chat_id
+    command = update.message.text.split(" ")[1::]
+    if isAuthorizedID(update.message.from_user.id, update.message.from_user.name):
+        bot.sendChatAction(chat_id=update.message.chat_id,
+                           action=ChatAction.TYPING)
+        output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output = output.stdout.read().decode('utf-8')
+        output = '`{0}`'.format(output)
+
+        bot.sendMessage(chat_id=update.message.chat_id,
+                    text=output, parse_mode="Markdown")
+    else:
+        return "Don't try " + update.inline_query.from_user.name
+
 def inlinequery(bot, update):
     query = update.inline_query.query
     o = execute(query, update, direct=False)
@@ -131,6 +146,7 @@ def sendNotAuthorizedMessage(bot, update):
 
 
 build_handler = CommandHandler('build', build)
+exec_handler = CommandHandler('exec', exec, pass_args=True)
 upload_handler = CommandHandler('upload', upload)
 restart_handler = CommandHandler('restart', restart)
 id_handler = CommandHandler('id', id)
@@ -140,6 +156,7 @@ dispatcher.add_handler(upload_handler)
 dispatcher.add_handler(restart_handler)
 dispatcher.add_handler(InlineQueryHandler(inlinequery))
 dispatcher.add_handler(id_handler)
+dispatcher.add_handler(exec_handler)
 
 updater.start_polling()
 updater.idle()
