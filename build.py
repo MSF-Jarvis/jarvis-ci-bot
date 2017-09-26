@@ -9,6 +9,7 @@ import time
 
 import sys
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
+from telegram.ext.dispatcher import run_async
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
 from uuid import uuid4
 
@@ -103,6 +104,7 @@ def execute(bot, update, direct=True):
     else:
         return "Die " + update.inline_query.from_user.name
 
+@run_async
 def exec(bot, update, args):
     chat_id = update.message.chat_id
     command = update.message.text.split(" ")[1::]
