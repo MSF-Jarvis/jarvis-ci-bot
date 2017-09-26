@@ -118,7 +118,7 @@ def exec(bot, update, args):
         bot.sendMessage(chat_id=update.message.chat_id,
                     text=output, parse_mode="Markdown")
     else:
-        return "Don't try " + update.inline_query.from_user.name
+        return "Don't try " + update.message.from_user.name
 
 def inlinequery(bot, update):
     query = update.inline_query.query
