@@ -12,6 +12,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Inlin
 from telegram.ext.dispatcher import run_async
 from telegram import InlineQueryResultArticle, ChatAction, InputTextMessageContent
 from uuid import uuid4
+import urllib.request
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -74,6 +75,15 @@ def restart(bot, update):
     else:
         sendNotAuthorizedMessage(bot, update)
 
+def ip(bot, update):
+    with urllib.request.urlopen("https://icanhazip.com/") as response:
+        bot.sendMessage(update.message.chat_id, response.read().decode('utf8'))
+
+def update(bot, update):
+    if isAuthorized(update):
+        subprocess.call(['bash', 'update.sh'])
+        restart(bot, update)
+
 def execute(bot, update, direct=True):
 
     try:
@@ -107,7 +117,7 @@ def execute(bot, update, direct=True):
 @run_async
 def exec(bot, update, args):
     chat_id = update.message.chat_id
-    command = update.message.text.split(" ")[1::]
+    command = update.message.text.replace('/exec ','')
     if isAuthorizedID(update.message.from_user.id, update.message.from_user.name):
         bot.sendChatAction(chat_id=update.message.chat_id,
                            action=ChatAction.TYPING)
@@ -135,7 +145,7 @@ def inlinequery(bot, update):
     bot.answerInlineQuery(update.inline_query.id, results=results, cache_time=10)
 
 def isAuthorized(update):
-    return update.message.from_user.id in sudo_users and update.message.from_user.name in sudo_usernames
+    return str(update.message.from_user.id) in sudo_users or update.message.from_user.name in sudo_usernames
 
 def isAuthorizedID(userid, username):
     return str(userid) in sudo_users and username in sudo_usernames
@@ -152,6 +162,8 @@ exec_handler = CommandHandler('exec', exec, pass_args=True)
 upload_handler = CommandHandler('upload', upload)
 restart_handler = CommandHandler('restart', restart)
 id_handler = CommandHandler('id', id)
+ip_handler = CommandHandler('ip', ip)
+update_handler = CommandHandler('update', update)
 
 dispatcher.add_handler(build_handler)
 dispatcher.add_handler(upload_handler)
@@ -159,7 +171,8 @@ dispatcher.add_handler(restart_handler)
 dispatcher.add_handler(InlineQueryHandler(inlinequery))
 dispatcher.add_handler(id_handler)
 dispatcher.add_handler(exec_handler)
+dispatcher.add_handler(ip_handler)
+dispatcher.add_handler(update_handler)
 
 updater.start_polling()
 updater.idle()
-# Paul's ID --> 171119240
