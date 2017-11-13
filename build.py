@@ -29,16 +29,18 @@ sudo_usernames = config['ADMIN']['usernames']
 dispatcher = updater.dispatcher
 
 
-def latest_build(bot, update):
+def latest_build(bot, update, args):
     build_type = "beta"
     try:
-        build_type = update.message.text.split(' ')[1::]
+        build_type = update.message.text.replace('/latest ', '')
     except IndexError:
         pass
-    files = glob.glob(path % build_type)
+    if build_type not in ['beta', 'stable', 'alpha']: build_type = "beta"
+    files = glob.glob(path + build_type + "/*")
     latest_file = max(files, key=os.path.getctime)
-    build_link = r"[{0}]({1})".format(latest_file, link + build_type + latest_file)
-    update.message.reply_text(build_link)
+    latest_file = latest_file.replace(path + build_type + '/', '')
+    build_link = "[{}]({})".format(latest_file, link + build_type + latest_file)
+    update.message.reply_text(build_link, parse_mode="Markdown")
 
 
 def id(bot, update):
@@ -146,7 +148,7 @@ restart_handler = CommandHandler('restart', restart)
 id_handler = CommandHandler('id', id)
 ip_handler = CommandHandler('ip', ip)
 update_handler = CommandHandler('update', update)
-latest_handler = CommandHandler('latest', latest_build)
+latest_handler = CommandHandler('latest', latest_build, pass_args=True)
 
 dispatcher.add_handler(restart_handler)
 dispatcher.add_handler(InlineQueryHandler(inlinequery))
