@@ -35,11 +35,18 @@ def latest_build(bot, update, args):
         build_type = update.message.text.replace('/latest ', '')
     except IndexError:
         pass
-    if build_type not in ['beta', 'stable', 'alpha']: build_type = "beta"
-    files = glob.glob(path + build_type + "/*")
+    if build_type not in ['beta', 'stable', 'alpha']:
+        build_type = "beta"
+    files = glob.glob(path + build_type + "/*.zip")
     latest_file = max(files, key=os.path.getctime)
     latest_file = latest_file.replace(path + build_type + '/', '')
-    build_link = "[{}]({})".format(latest_file, link + build_type + latest_file)
+    base_url = link + build_type + '/'
+    latest_changelog = latest_file.replace(".zip", "_changelog.txt")
+    build_link = "*{}*\n_Link_ : [{}]({})\n_Changelog_[{}]({})"\
+        .format(build_type,
+                latest_file,
+                base_url + latest_file,
+                latest_changelog, base_url + latest_changelog)
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
