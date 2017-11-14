@@ -42,11 +42,10 @@ def latest_build(bot, update, args):
     latest_file = latest_file.replace(path + build_type + '/', '')
     base_url = link + build_type + '/'
     latest_changelog = latest_file.replace(".zip", "_changelog.txt")
-    build_link = "*{}*\n_Link_ : [{}]({})\n_Changelog_[{}]({})"\
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
         .format(build_type,
-                latest_file,
                 base_url + latest_file,
-                latest_changelog, base_url + latest_changelog)
+                base_url + latest_changelog)
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
