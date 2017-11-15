@@ -41,7 +41,8 @@ def publish(bot, update):
     if not isAuthorized(update):
         sendNotAuthorizedMessage(bot, update)
         return
-    bot.sendChatAction(ChatAction.TYPING)
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
     newest_build = get_latest_build("beta")
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
