@@ -29,6 +29,31 @@ sudo_usernames = config['ADMIN']['usernames']
 dispatcher = updater.dispatcher
 
 
+def get_latest_build(build_type):
+    files = glob.glob(path + build_type + "/*.zip")
+    latest_file = max(files, key=os.path.getctime)
+    latest_file = latest_file.replace(path + build_type + '/', '')
+    latest_changelog = latest_file.replace(".zip", "_changelog.txt")
+    return {'file_name': latest_file, 'changelog_file': latest_changelog}
+
+
+def publish(bot, update):
+    if not isAuthorized(update):
+        sendNotAuthorizedMessage(bot, update)
+        return
+    bot.sendChatAction(ChatAction.TYPING)
+    newest_build = get_latest_build("beta")
+    latest_file = newest_build['file_name']
+    latest_changelog = newest_build['changelog_file']
+    os.rename(path + "beta/" + latest_file, path + "stable/" + latest_file)
+    os.rename(path + "beta/" + latest_changelog, path + "stable/" + latest_changelog)
+    base_url = link + "stable/"
+    build_link = "*Latest beta build promoted to stable*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})" \
+        .format(base_url + latest_file,
+                base_url + latest_changelog)
+    update.message.reply_text(build_link, parse_mode="Markdown")
+
+
 def latest_build(bot, update, args):
     build_type = "beta"
     try:
@@ -37,11 +62,10 @@ def latest_build(bot, update, args):
         pass
     if build_type not in ['beta', 'stable', 'alpha']:
         build_type = "beta"
-    files = glob.glob(path + build_type + "/*.zip")
-    latest_file = max(files, key=os.path.getctime)
-    latest_file = latest_file.replace(path + build_type + '/', '')
+    newest_build = get_latest_build(build_type)
+    latest_file = newest_build['file_name']
+    latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
-    latest_changelog = latest_file.replace(".zip", "_changelog.txt")
     build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
         .format(build_type,
                 base_url + latest_file,
@@ -155,6 +179,7 @@ id_handler = CommandHandler('id', id)
 ip_handler = CommandHandler('ip', ip)
 update_handler = CommandHandler('update', update)
 latest_handler = CommandHandler('latest', latest_build, pass_args=True)
+publish_handler = CommandHandler('publish', publish)
 
 dispatcher.add_handler(restart_handler)
 dispatcher.add_handler(InlineQueryHandler(inlinequery))
@@ -163,6 +188,7 @@ dispatcher.add_handler(exec_handler)
 dispatcher.add_handler(ip_handler)
 dispatcher.add_handler(update_handler)
 dispatcher.add_handler(latest_handler)
+dispatcher.add_handler(publish_handler)
 
 updater.start_polling()
 updater.idle()
