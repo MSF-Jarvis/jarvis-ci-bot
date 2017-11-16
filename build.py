@@ -37,7 +37,7 @@ def get_latest_build(build_type):
     return {'file_name': latest_file, 'changelog_file': latest_changelog}
 
 
-def publish(bot, update):
+def publishbeta(bot, update):
     if not isAuthorized(update):
         sendNotAuthorizedMessage(bot, update)
         return
@@ -50,6 +50,24 @@ def publish(bot, update):
     os.rename(path + "beta/" + latest_changelog, path + "stable/" + latest_changelog)
     base_url = link + "stable/"
     build_link = "*Latest beta build promoted to stable*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})" \
+        .format(base_url + latest_file,
+                base_url + latest_changelog)
+    update.message.reply_text(build_link, parse_mode="Markdown")
+
+
+def publishalpha(bot, update):
+    if not isAuthorized(update):
+        sendNotAuthorizedMessage(bot, update)
+        return
+    bot.sendChatAction(chat_id=update.message.chat_id,
+                       action=ChatAction.TYPING)
+    newest_build = get_latest_build("alpha")
+    latest_file = newest_build['file_name']
+    latest_changelog = newest_build['changelog_file']
+    os.rename(path + "alpha/" + latest_file, path + "beta/" + latest_file)
+    os.rename(path + "alpha/" + latest_changelog, path + "beta/" + latest_changelog)
+    base_url = link + "beta/"
+    build_link = "*Latest alpha build promoted to beta*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})" \
         .format(base_url + latest_file,
                 base_url + latest_changelog)
     update.message.reply_text(build_link, parse_mode="Markdown")
@@ -200,7 +218,8 @@ dispatcher.add_handler(CommandHandler('id', id))
 dispatcher.add_handler(CommandHandler('exec', exec_cmd, pass_args=True))
 dispatcher.add_handler(CommandHandler('ip', ip))
 dispatcher.add_handler(CommandHandler('update', update))
-dispatcher.add_handler(CommandHandler('publish', publish))
+dispatcher.add_handler(CommandHandler('publishbeta', publishbeta))
+dispatcher.add_handler(CommandHandler('publishalpha', publishalpha))
 dispatcher.add_handler(CommandHandler('beta', latest_beta_build))
 dispatcher.add_handler(CommandHandler('alpha', latest_alpha_build))
 dispatcher.add_handler(CommandHandler('stable', latest_stable_build))
