@@ -55,14 +55,34 @@ def publish(bot, update):
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
-def latest_build(bot, update, args):
+def latest_beta_build(bot, update):
     build_type = "beta"
-    try:
-        build_type = update.message.text.replace('/latest ', '')
-    except IndexError:
-        pass
-    if build_type not in ['beta', 'stable', 'alpha']:
-        build_type = "beta"
+    newest_build = get_latest_build(build_type)
+    latest_file = newest_build['file_name']
+    latest_changelog = newest_build['changelog_file']
+    base_url = link + build_type + '/'
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
+        .format(build_type,
+                base_url + latest_file,
+                base_url + latest_changelog)
+    update.message.reply_text(build_link, parse_mode="Markdown")
+
+
+def latest_alpha_build(bot, update):
+    build_type = "alpha"
+    newest_build = get_latest_build(build_type)
+    latest_file = newest_build['file_name']
+    latest_changelog = newest_build['changelog_file']
+    base_url = link + build_type + '/'
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
+        .format(build_type,
+                base_url + latest_file,
+                base_url + latest_changelog)
+    update.message.reply_text(build_link, parse_mode="Markdown")
+
+
+def latest_stable_build(bot, update):
+    build_type = "stable"
     newest_build = get_latest_build(build_type)
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
@@ -174,22 +194,16 @@ def sendNotAuthorizedMessage(bot, update):
                     text="@" + update.message.from_user.username + " isn't authorized for this task!")
 
 
-exec_handler = CommandHandler('exec', exec_cmd, pass_args=True)
-restart_handler = CommandHandler('restart', restart)
-id_handler = CommandHandler('id', id)
-ip_handler = CommandHandler('ip', ip)
-update_handler = CommandHandler('update', update)
-latest_handler = CommandHandler('latest', latest_build, pass_args=True)
-publish_handler = CommandHandler('publish', publish)
-
-dispatcher.add_handler(restart_handler)
+dispatcher.add_handler(CommandHandler('restart', restart))
 dispatcher.add_handler(InlineQueryHandler(inlinequery))
-dispatcher.add_handler(id_handler)
-dispatcher.add_handler(exec_handler)
-dispatcher.add_handler(ip_handler)
-dispatcher.add_handler(update_handler)
-dispatcher.add_handler(latest_handler)
-dispatcher.add_handler(publish_handler)
+dispatcher.add_handler(CommandHandler('id', id))
+dispatcher.add_handler(CommandHandler('exec', exec_cmd, pass_args=True))
+dispatcher.add_handler(CommandHandler('ip', ip))
+dispatcher.add_handler(CommandHandler('update', update))
+dispatcher.add_handler(CommandHandler('publish', publish))
+dispatcher.add_handler(CommandHandler('beta', latest_beta_build))
+dispatcher.add_handler(CommandHandler('alpha', latest_alpha_build))
+dispatcher.add_handler(CommandHandler('stable', latest_stable_build))
 
 updater.start_polling()
 updater.idle()
