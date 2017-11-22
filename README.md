@@ -1,4 +1,4 @@
-# KronicBot
+# Jarvis-CI
 
 To get started, edit the `bot.ini` file with your favourite text editor to setup all the different variables needed to run the bot correctly.
 

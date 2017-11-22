@@ -1,7 +1,8 @@
 [KEYS]
-bot_api = api_key
+bot_api = your_bot_token
 [ADMIN]
-sudo = [your_id]
-usernames = [@username]
-[PATH]
-path = /path/to/source/with/trailing/slash/
+sudo = [your_telegram_id]
+usernames = [@your_telegram_username]
+[DATA]
+path = /path/to/kernel/storage/dir
+url = https://mydomain.tld/
