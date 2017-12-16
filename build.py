@@ -160,6 +160,19 @@ def execute(bot, update, direct=True):
         command = update.inline_query.query
         inline = True
 
+    if command.split(' ')[0] in ['beta', 'alpha', 'stable']:
+        build_link = ""
+        build_type = command.split(' ')[0]
+        if build_type == "beta": build_link = _latest_beta_build()
+        elif build_type == "alpha": build_link = _latest_alpha_build()
+        elif build_type == "stable": build_link = _latest_stable_build()
+        if not inline:
+            bot.sendMessage(chat_id=update.message.chat_id,
+                text=build_link, parse_mode="Markdown")
+            return False
+        else:
+            return build_link
+
     if isAuthorizedID(user_id, update.inline_query.from_user.name):
         if not inline:
             bot.sendChatAction(chat_id=update.message.chat_id,
