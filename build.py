@@ -73,7 +73,7 @@ def publishalpha(bot, update):
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
-def latest_beta_build(bot, update):
+def _latest_beta_build():
     build_type = "beta"
     newest_build = get_latest_build(build_type)
     latest_file = newest_build['file_name']
@@ -83,10 +83,14 @@ def latest_beta_build(bot, update):
         .format(build_type,
                 base_url + latest_file,
                 base_url + latest_changelog)
+    return build_link
+
+def latest_beta_build(bot, update):
+    build_link = _latest_beta_build()
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
-def latest_alpha_build(bot, update):
+def _latest_alpha_build():
     build_type = "alpha"
     newest_build = get_latest_build(build_type)
     latest_file = newest_build['file_name']
@@ -96,10 +100,14 @@ def latest_alpha_build(bot, update):
         .format(build_type,
                 base_url + latest_file,
                 base_url + latest_changelog)
+    return build_link
+
+def latest_alpha_build(bot, update):
+    build_link = _latest_alpha_build()
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
-def latest_stable_build(bot, update):
+def _latest_stable_build():
     build_type = "stable"
     newest_build = get_latest_build(build_type)
     latest_file = newest_build['file_name']
@@ -109,6 +117,11 @@ def latest_stable_build(bot, update):
         .format(build_type,
                 base_url + latest_file,
                 base_url + latest_changelog)
+    return build_link
+
+
+def latest_stable_build(bot, update):
+    build_link = _latest_stable_build()
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
