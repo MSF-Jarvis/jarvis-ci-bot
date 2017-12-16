@@ -79,9 +79,8 @@ def _latest_beta_build():
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
-    build_link = "*Latest {} build*\n\n*{}*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
         .format(build_type,
-                latest_file,
                 base_url + latest_file,
                 base_url + latest_changelog)
     return build_link
@@ -97,9 +96,8 @@ def _latest_alpha_build():
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
-    build_link = "*Latest {} build*\n\n*{}*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
         .format(build_type,
-                latest_file,
                 base_url + latest_file,
                 base_url + latest_changelog)
     return build_link
@@ -115,9 +113,8 @@ def _latest_stable_build():
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
-    build_link = "*Latest {} build*\n\n*{}*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
         .format(build_type,
-                latest_file,
                 base_url + latest_file,
                 base_url + latest_changelog)
     return build_link
