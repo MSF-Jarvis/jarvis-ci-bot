@@ -145,7 +145,7 @@ def ip(bot, update):
 
 def update(bot, update):
     if isAuthorized(update):
-        subprocess.call(['bash', 'update.sh'])
+        subprocess.Popen('bash update.sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         restart(bot, update)
 
 
