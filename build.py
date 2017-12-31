@@ -250,5 +250,5 @@ dispatcher.add_handler(CommandHandler('beta', latest_beta_build))
 dispatcher.add_handler(CommandHandler('alpha', latest_alpha_build))
 dispatcher.add_handler(CommandHandler('stable', latest_stable_build))
 
-updater.start_polling()
+updater.start_polling(clean=True)
 updater.idle()
