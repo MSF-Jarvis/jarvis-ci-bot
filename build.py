@@ -31,6 +31,8 @@ dispatcher = updater.dispatcher
 
 def get_latest_build(build_type):
     files = glob.glob(path + build_type + "/*.zip")
+    if len(files) == 0:
+        return ""
     latest_file = max(files, key=os.path.getctime)
     latest_file = latest_file.replace(path + build_type + '/', '')
     latest_changelog = latest_file.replace(".zip", "_changelog.txt")
@@ -76,6 +78,8 @@ def publishalpha(bot, update):
 def _latest_beta_build():
     build_type = "beta"
     newest_build = get_latest_build(build_type)
+    if newest_build == "":
+        update.message.reply_text("There are no current {} builds".format(build_type), parse_mode="Markdown")
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
@@ -93,6 +97,8 @@ def latest_beta_build(bot, update):
 def _latest_alpha_build():
     build_type = "alpha"
     newest_build = get_latest_build(build_type)
+    if newest_build == "":
+        update.message.reply_text("There are no current {} builds".format(build_type), parse_mode="Markdown")
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
@@ -110,6 +116,8 @@ def latest_alpha_build(bot, update):
 def _latest_stable_build():
     build_type = "stable"
     newest_build = get_latest_build(build_type)
+    if newest_build == "":
+        update.message.reply_text("There are no current {} builds".format(build_type), parse_mode="Markdown")
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
