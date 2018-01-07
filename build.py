@@ -79,7 +79,8 @@ def _latest_beta_build():
     build_type = "beta"
     newest_build = get_latest_build(build_type)
     if newest_build == "":
-        update.message.reply_text("There are no current {} builds".format(build_type), parse_mode="Markdown")
+        build_link = "There are no current {} builds".format(build_type)
+        return
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
@@ -98,7 +99,8 @@ def _latest_alpha_build():
     build_type = "alpha"
     newest_build = get_latest_build(build_type)
     if newest_build == "":
-        update.message.reply_text("There are no current {} builds".format(build_type), parse_mode="Markdown")
+        build_link = "There are no current {} builds".format(build_type)
+        return
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
@@ -117,7 +119,8 @@ def _latest_stable_build():
     build_type = "stable"
     newest_build = get_latest_build(build_type)
     if newest_build == "":
-        update.message.reply_text("There are no current {} builds".format(build_type), parse_mode="Markdown")
+        build_link = "There are no current {} builds".format(build_type)
+        return
     latest_file = newest_build['file_name']
     latest_changelog = newest_build['changelog_file']
     base_url = link + build_type + '/'
