@@ -28,7 +28,6 @@ sudo_users = config['ADMIN']['sudo']
 sudo_usernames = config['ADMIN']['usernames']
 dispatcher = updater.dispatcher
 
-
 def get_latest_build(build_type):
     files = glob.glob(path + build_type + "/*.zip")
     if len(files) == 0:
@@ -75,6 +74,26 @@ def publishalpha(bot, update):
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
+def _latest_test_build():
+    build_type = "test"
+    newest_build = get_latest_build(build_type)
+    if newest_build == "":
+        return "There are no current {} builds".format(build_type)
+    latest_file = newest_build['file_name']
+    latest_changelog = newest_build['changelog_file']
+    base_url = link + build_type + '/'
+    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
+        .format(build_type,
+                base_url + latest_file,
+                base_url + latest_changelog)
+    return build_link
+
+
+def latest_test_build(bot, update):
+    build_link = _latest_test_build()
+    update.message.reply_text(build_link, parse_mode="Markdown")
+
+
 def _latest_beta_build():
     build_type = "beta"
     newest_build = get_latest_build(build_type)
@@ -88,6 +107,7 @@ def _latest_beta_build():
                 base_url + latest_file,
                 base_url + latest_changelog)
     return build_link
+
 
 def latest_beta_build(bot, update):
     build_link = _latest_beta_build()
@@ -107,6 +127,7 @@ def _latest_alpha_build():
                 base_url + latest_file,
                 base_url + latest_changelog)
     return build_link
+
 
 def latest_alpha_build(bot, update):
     build_link = _latest_alpha_build()
@@ -174,6 +195,7 @@ def execute(bot, update, direct=True):
         if build_type == "beta": build_link = _latest_beta_build()
         elif build_type == "alpha": build_link = _latest_alpha_build()
         elif build_type == "stable": build_link = _latest_stable_build()
+        elif build_type == "test": build_link = _latest_test_build()
         if not inline:
             bot.sendMessage(chat_id=update.message.chat_id,
                 text=build_link, parse_mode="Markdown")
@@ -257,6 +279,7 @@ dispatcher.add_handler(CommandHandler('publishalpha', publishalpha))
 dispatcher.add_handler(CommandHandler('beta', latest_beta_build))
 dispatcher.add_handler(CommandHandler('alpha', latest_alpha_build))
 dispatcher.add_handler(CommandHandler('stable', latest_stable_build))
+dispatcher.add_handler(CommandHandler('test', latest_test_build))
 
 updater.start_polling(clean=True)
 updater.idle()
