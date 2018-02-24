@@ -26,6 +26,7 @@ path = config['DATA']['path']
 link = config['DATA']['url']
 sudo_users = config['ADMIN']['sudo']
 sudo_usernames = config['ADMIN']['usernames']
+REMOTE_COMMAND = config['DATA']['remote']
 dispatcher = updater.dispatcher
 
 def get_latest_build(build_type):
@@ -189,7 +190,7 @@ def execute(bot, update, direct=True):
         command = update.inline_query.query
         inline = True
 
-    if command.split(' ')[0] in ['beta', 'alpha', 'stable']:
+    if command.split(' ')[0] in ['beta', 'alpha', 'stable', 'test']:
         build_link = ""
         build_type = command.split(' ')[0]
         if build_type == "beta": build_link = _latest_beta_build()
@@ -221,6 +222,15 @@ def execute(bot, update, direct=True):
     else:
         return "Die " + update.inline_query.from_user.name
 
+@run_async
+def build(bot, update, args):
+    if isAuthorizedID(update.message.from_user.id, update.message.from_user.name):
+        build_type = update.message.text.replace('/build ', '')
+        if build_type in ['beta', 'alpha', 'stable', 'test']:
+            FNULL = open(subprocess.devnull, 'w')
+            subprocess.call([REMOTE_COMMAND, build_type])
+    else:
+        sendNotAuthorizedMessage(bot, update)
 
 @run_async
 def exec_cmd(bot, update, args):
@@ -267,19 +277,21 @@ def sendNotAuthorizedMessage(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id,
                     text="@" + update.message.from_user.username + " isn't authorized for this task!")
 
+add_handler = dispatcher.add_handler
 
-dispatcher.add_handler(CommandHandler('restart', restart))
-dispatcher.add_handler(InlineQueryHandler(inlinequery))
-dispatcher.add_handler(CommandHandler('id', id))
-dispatcher.add_handler(CommandHandler('exec', exec_cmd, pass_args=True))
-dispatcher.add_handler(CommandHandler('ip', ip))
-dispatcher.add_handler(CommandHandler('update', update))
-dispatcher.add_handler(CommandHandler('publishbeta', publishbeta))
-dispatcher.add_handler(CommandHandler('publishalpha', publishalpha))
-dispatcher.add_handler(CommandHandler('beta', latest_beta_build))
-dispatcher.add_handler(CommandHandler('alpha', latest_alpha_build))
-dispatcher.add_handler(CommandHandler('stable', latest_stable_build))
-dispatcher.add_handler(CommandHandler('test', latest_test_build))
+add_handler(CommandHandler('restart', restart))
+add_handler(InlineQueryHandler(inlinequery))
+add_handler(CommandHandler('id', id))
+add_handler(CommandHandler('exec', exec_cmd, pass_args=True))
+add_handler(CommandHandler('ip', ip))
+add_handler(CommandHandler('update', update))
+add_handler(CommandHandler('publishbeta', publishbeta))
+add_handler(CommandHandler('publishalpha', publishalpha))
+add_handler(CommandHandler('beta', latest_beta_build))
+add_handler(CommandHandler('alpha', latest_alpha_build))
+add_handler(CommandHandler('stable', latest_stable_build))
+add_handler(CommandHandler('test', latest_test_build))
+add_handler(CommandHandler('build', build, pass_args=True))
 
 updater.start_polling(clean=True)
 updater.idle()
