@@ -228,7 +228,8 @@ def build(bot, update, args):
         build_type = update.message.text.replace('/build ', '')
         if build_type in ['beta', 'alpha', 'stable', 'test']:
             FNULL = open(subprocess.devnull, 'w')
-            subprocess.call([REMOTE_COMMAND, build_type])
+            bot.sendMessage(chat_id=update.message.chat_id, text="Building {}".format(build_type))
+            subprocess.call([REMOTE_COMMAND, build_type], stdout=FNULL, sterr=FNULL)
     else:
         sendNotAuthorizedMessage(bot, update)
 
