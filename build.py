@@ -26,7 +26,6 @@ path = config['DATA']['path']
 link = config['DATA']['url']
 sudo_users = config['ADMIN']['sudo']
 sudo_usernames = config['ADMIN']['usernames']
-REMOTE_COMMAND = config['DATA']['remote']
 dispatcher = updater.dispatcher
 
 def get_latest_build(build_type):
@@ -223,17 +222,6 @@ def execute(bot, update, direct=True):
         return "Die " + update.inline_query.from_user.name
 
 @run_async
-def build(bot, update, args):
-    if isAuthorizedID(update.message.from_user.id, update.message.from_user.name):
-        build_type = update.message.text.replace('/build ', '')
-        if build_type in ['beta', 'alpha', 'stable', 'test']:
-            FNULL = open(subprocess.devnull, 'w')
-            bot.sendMessage(chat_id=update.message.chat_id, text="Building {}".format(build_type))
-            subprocess.call([REMOTE_COMMAND, build_type], stdout=FNULL, sterr=FNULL)
-    else:
-        sendNotAuthorizedMessage(bot, update)
-
-@run_async
 def exec_cmd(bot, update, args):
     command = update.message.text.replace('/exec ', '')
     if isAuthorizedID(update.message.from_user.id, update.message.from_user.name):
@@ -292,7 +280,6 @@ add_handler(CommandHandler('beta', latest_beta_build))
 add_handler(CommandHandler('alpha', latest_alpha_build))
 add_handler(CommandHandler('stable', latest_stable_build))
 add_handler(CommandHandler('test', latest_test_build))
-add_handler(CommandHandler('build', build, pass_args=True))
 
 updater.start_polling(clean=True)
 updater.idle()
