@@ -38,42 +38,6 @@ def get_latest_build(build_type):
     return {'file_name': latest_file, 'changelog_file': latest_changelog}
 
 
-def publishbeta(bot, update):
-    if not isAuthorized(update):
-        sendNotAuthorizedMessage(bot, update)
-        return
-    bot.sendChatAction(chat_id=update.message.chat_id,
-                       action=ChatAction.TYPING)
-    newest_build = get_latest_build("beta")
-    latest_file = newest_build['file_name']
-    latest_changelog = newest_build['changelog_file']
-    os.rename(path + "beta/" + latest_file, path + "stable/" + latest_file)
-    os.rename(path + "beta/" + latest_changelog, path + "stable/" + latest_changelog)
-    base_url = link + "stable/"
-    build_link = "*Latest beta build promoted to stable*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})" \
-        .format(base_url + latest_file,
-                base_url + latest_changelog)
-    update.message.reply_text(build_link, parse_mode="Markdown")
-
-
-def publishalpha(bot, update):
-    if not isAuthorized(update):
-        sendNotAuthorizedMessage(bot, update)
-        return
-    bot.sendChatAction(chat_id=update.message.chat_id,
-                       action=ChatAction.TYPING)
-    newest_build = get_latest_build("alpha")
-    latest_file = newest_build['file_name']
-    latest_changelog = newest_build['changelog_file']
-    os.rename(path + "alpha/" + latest_file, path + "beta/" + latest_file)
-    os.rename(path + "alpha/" + latest_changelog, path + "beta/" + latest_changelog)
-    base_url = link + "beta/"
-    build_link = "*Latest alpha build promoted to beta*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})" \
-        .format(base_url + latest_file,
-                base_url + latest_changelog)
-    update.message.reply_text(build_link, parse_mode="Markdown")
-
-
 def _latest_test_build():
     build_type = "test"
     newest_build = get_latest_build(build_type)
@@ -111,26 +75,6 @@ def _latest_beta_build():
 
 def latest_beta_build(bot, update):
     build_link = _latest_beta_build()
-    update.message.reply_text(build_link, parse_mode="Markdown")
-
-
-def _latest_alpha_build():
-    build_type = "alpha"
-    newest_build = get_latest_build(build_type)
-    if newest_build == "":
-        return "There are no current {} builds".format(build_type)
-    latest_file = newest_build['file_name']
-    latest_changelog = newest_build['changelog_file']
-    base_url = link + build_type + '/'
-    build_link = "*Latest {} build*\n\n*Link* : [ZIP]({})\n\n*Changelog* : [Changelog]({})"\
-        .format(build_type,
-                base_url + latest_file,
-                base_url + latest_changelog)
-    return build_link
-
-
-def latest_alpha_build(bot, update):
-    build_link = _latest_alpha_build()
     update.message.reply_text(build_link, parse_mode="Markdown")
 
 
@@ -189,11 +133,10 @@ def execute(bot, update, direct=True):
         command = update.inline_query.query
         inline = True
 
-    if command.split(' ')[0] in ['beta', 'alpha', 'stable', 'test']:
+    if command.split(' ')[0] in ['beta', 'stable', 'test']:
         build_link = ""
         build_type = command.split(' ')[0]
         if build_type == "beta": build_link = _latest_beta_build()
-        elif build_type == "alpha": build_link = _latest_alpha_build()
         elif build_type == "stable": build_link = _latest_stable_build()
         elif build_type == "test": build_link = _latest_test_build()
         if not inline:
@@ -274,10 +217,7 @@ add_handler(CommandHandler('id', id))
 add_handler(CommandHandler('exec', exec_cmd, pass_args=True))
 add_handler(CommandHandler('ip', ip))
 add_handler(CommandHandler('update', update))
-add_handler(CommandHandler('publishbeta', publishbeta))
-add_handler(CommandHandler('publishalpha', publishalpha))
 add_handler(CommandHandler('beta', latest_beta_build))
-add_handler(CommandHandler('alpha', latest_alpha_build))
 add_handler(CommandHandler('stable', latest_stable_build))
 add_handler(CommandHandler('test', latest_test_build))
 
